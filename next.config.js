@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const NextFederationPlugin = require('@module-federation/nextjs-mf');
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 function getRemotes(isSsr) {
   const mfe1URL = 'http://localhost:5001';
@@ -21,6 +24,13 @@ const nextConfig = {
       filename: 'static/chunks/remoteEntry.js',
       exposes: {},
       remotes: getRemotes(isServer),
+      shared: {
+        'lodash-es': {
+          singleton: true,
+          requiredVersion: false,
+          eager: true
+        }
+      }
     };
     config.plugins.push(new NextFederationPlugin(moduleFederationConfig));
 
@@ -28,4 +38,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig);
